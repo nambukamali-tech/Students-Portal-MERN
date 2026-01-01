@@ -8,27 +8,29 @@ const StudentSchema = new mongoose.Schema(
         },
         registerNumber : {
          type : String,
-         required : true
+         required : [true , "Register Number is Required"]
         },
         studentStatus : {
             type : String,
             enum : ["Active" , "Inactive"],
-            required : true
+            required : [true , "Student Status is Required"]
         },
         studentName : {
             type : String,
-            required : true
+            required : [true, "Student Name is Required"]
         },
         department : {
             type : String ,
-            required : true
+            required : [true, "Department is Required"]
         },
         inTime : {
-            type : String
+            type : String,
+            required : [true, "InTime is required"]
            
         },
         outTime : {
-            type : String        
+            type : String,
+            required : [true, "OutTime is required"]        
         }
     },
     {
