@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment-timezone";
 
-// TimePicker component
+/* 🌍 TimePicker */
 function TimePicker({ label, value, onChange }) {
   const countries = [
     { name: "India", tz: "Asia/Kolkata" },
@@ -12,9 +12,7 @@ function TimePicker({ label, value, onChange }) {
     { name: "USA (New York)", tz: "America/New_York" },
   ];
 
-  const [selectedCountry, setSelectedCountry] = useState(
-    countries[0].tz
-  );
+  const [selectedCountry, setSelectedCountry] = useState(countries[0].tz);
 
   const handleCountryChange = (e) => {
     const tz = e.target.value;
@@ -25,31 +23,25 @@ function TimePicker({ label, value, onChange }) {
     }
   };
 
-  const handleTimeChange = (e) => {
-    onChange(e.target.value);
-  };
-
   const currentTime = value || moment().tz(selectedCountry).format("HH:mm");
 
   return (
     <div className="mb-3">
-      <label className="form-label">{label}</label>
+      <label className="form-label text-light">{label}</label>
       <div className="d-flex gap-2">
         <input
           type="time"
-          className="form-control"
+          className="form-control futuristic-input"
           value={currentTime}
-          onChange={handleTimeChange}
+          onChange={(e) => onChange(e.target.value)}
         />
         <select
-          className="form-select"
+          className="form-select futuristic-input"
           value={selectedCountry}
           onChange={handleCountryChange}
         >
           {countries.map((c) => (
-            <option key={c.tz} value={c.tz}>
-              {c.name}
-            </option>
+            <option key={c.tz} value={c.tz}>{c.name}</option>
           ))}
         </select>
       </div>
@@ -81,10 +73,6 @@ export default function EditStudent() {
     setStudent({ ...student, [e.target.name]: e.target.value });
   };
 
-  const handleTimeChange = (field, value) => {
-    setStudent({ ...student, [field]: value });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
@@ -94,98 +82,144 @@ export default function EditStudent() {
   };
 
   return (
-    <div>
-      <h2 className="mb-4">Edit Student</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Register Number</label>
-          <input
-            type="text"
-            className="form-control"
-            name="registerNumber"
-            value={student.registerNumber}
-            onChange={handleChange}
-            required
-          />
+    <>
+      {/* 🔮 STYLES */}
+      <style>{`
+        .edit-container {
+          min-height: 100vh;
+          padding: 40px;
+          background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        }
+
+        .glass-card {
+          max-width: 750px;
+          margin: auto;
+          background: rgba(255,255,255,0.08);
+          backdrop-filter: blur(14px);
+          border-radius: 16px;
+          padding: 30px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+        }
+
+        .page-title {
+          text-align: center;
+          margin-bottom: 25px;
+          font-weight: 600;
+          background: linear-gradient(90deg, #00f5ff, #7cffcb);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .futuristic-input {
+          background: rgba(255,255,255,0.1) !important;
+          border: 1px solid rgba(255,255,255,0.25) !important;
+          color: #fff !important;
+          border-radius: 10px;
+        }
+
+        .btn-update {
+          background: linear-gradient(135deg, #00c6ff, #0072ff);
+          border: none;
+          padding: 10px 24px;
+          border-radius: 12px;
+          color: #fff;
+          margin-top: 15px;
+        }
+
+        .btn-update:hover {
+          opacity: 0.9;
+        }
+      `}</style>
+
+      {/* 🚀 FORM */}
+      <div className="edit-container">
+        <div className="glass-card">
+          <h2 className="page-title">✏️ Edit Student</h2>
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label text-light">Register Number</label>
+              <input
+                type="text"
+                name="registerNumber"
+                className="form-control futuristic-input"
+                value={student.registerNumber}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label text-light">Student Name</label>
+              <input
+                type="text"
+                name="studentName"
+                className="form-control futuristic-input"
+                value={student.studentName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label text-light">Status</label>
+              <select
+                name="studentStatus"
+                className="form-select futuristic-input"
+                value={student.studentStatus}
+                onChange={handleChange}
+              >
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label text-light">Department</label>
+              <select
+                name="department"
+                className="form-select futuristic-input"
+                value={student.department}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Select Course --</option>
+                <optgroup label="UG Courses">
+                  <option>BSc CS</option>
+                  <option>BSc Maths</option>
+                  <option>BSc Chemistry</option>
+                  <option>BSc Physics</option>
+                  <option>BCA</option>
+                </optgroup>
+                <optgroup label="PG Courses">
+                  <option>MSc CS</option>
+                  <option>MSc Maths</option>
+                  <option>MSc Physics</option>
+                </optgroup>
+                <optgroup label="PhD Courses">
+                  <option>PhD CS</option>
+                  <option>PhD Physics</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <TimePicker
+              label="In Time"
+              value={student.inTime}
+              onChange={(v) => setStudent({ ...student, inTime: v })}
+            />
+            <TimePicker
+              label="Out Time"
+              value={student.outTime}
+              onChange={(v) => setStudent({ ...student, outTime: v })}
+            />
+
+            <button type="submit" className="btn btn-update w-100">
+              🔄 Update Student
+            </button>
+          </form>
         </div>
-
-        <div className="mb-3">
-          <label className="form-label">Name</label>
-          <input
-            type="text"
-            className="form-control"
-            name="studentName"
-            value={student.studentName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Status</label>
-          <select
-            className="form-select"
-            name="studentStatus"
-            value={student.studentStatus}
-            onChange={handleChange}
-          >
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Department</label>
-          <select
-            className="form-select"
-            name="department"
-            value={student.department}
-            onChange={handleChange}
-            required
-          >
-            <option value="">--Select the Course--</option>
-            <optgroup label="UG Courses">
-              <option value="BSc Computer Science">BSc CS</option>
-              <option value="BSc Mathematics">BSc Maths</option>
-              <option value="BSc Chemistry">BSc Chem</option>
-              <option value="BSc Physics">BSc Phy</option>
-              <option value="BCA">BCA</option>
-              <option value="BSc Botany">BSc Botany</option>
-              <option value="BSc Zoology">BSc Zoology</option>
-              <option value="BA Tamil">BA Tamil</option>
-              <option value="BA English">BA English</option>
-            </optgroup>
-            <optgroup label="PG Courses">
-              <option value="MSc CS">MSc Computer Science</option>
-              <option value="MSc Maths">MSc Mathematics</option>
-              <option value="MSc Physics">MSc Physics</option>
-              <option value="MSc Zoology">MSc Zoology</option>
-              <option value="MA English">MA English</option>
-              <option value="MA Tamil">MA Tamil</option>
-            </optgroup>
-            <optgroup label="Phd Courses">
-              <option value="Phd in Computer Science">Phd CS</option>
-              <option value="Phd in Tamil">Phd Tamil</option>
-              <option value="Phd in Physics">Phd Physics</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <TimePicker
-          label="In Time"
-          value={student.inTime}
-          onChange={(val) => handleTimeChange("inTime", val)}
-        />
-        <TimePicker
-          label="Out Time"
-          value={student.outTime}
-          onChange={(val) => handleTimeChange("outTime", val)}
-        />
-
-        <button type="submit" className="btn btn-primary">
-          Update Student
-        </button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 }
