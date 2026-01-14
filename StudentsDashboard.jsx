@@ -121,19 +121,19 @@ export default function Dashboard() {
       {/* 🚀 DASHBOARD */}
       <div className="dashboard-container">
         <div className="glass-card">
-          <h2 className="dashboard-title">🚀 Student Management</h2>
+          <h2 className="dashboard-title"> STUDENT MANAGEMENT</h2>
 
           <div className="table-responsive">
             <table className="table futuristic-table">
               <thead>
                 <tr>
-                  <th>Reg No</th>
-                  <th>Name</th>
-                  <th>Status</th>
-                  <th>Dept</th>
-                  <th>In</th>
-                  <th>Out</th>
-                  <th>Actions</th>
+                  <th>REG NO</th>
+                  <th>STUDENT NAME</th>
+                  <th>STUDENT STATUS</th>
+                  <th>DEPARTMENT</th>
+                  <th>IN TIME</th>
+                  <th>OUT TIME</th>
+                  <th>ACTIONS</th>
                 </tr>
               </thead>
 
