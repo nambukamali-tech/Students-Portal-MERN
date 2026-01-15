@@ -118,7 +118,7 @@ export default function AddStudentPapers() {
       {/* 🚀 FORM */}
       <div className="paper-container">
         <form className="glass-form" onSubmit={handleSubmit}>
-          <h3 className="form-title">📄 Add Student Papers</h3>
+          <h3 className="form-title"> Add Student Papers</h3>
 
           <input
             className="form-control-custom"
@@ -160,11 +160,11 @@ export default function AddStudentPapers() {
 
           <div className="mt-3">
             <button type="button" className="btn btn-add" onClick={addPaper}>
-              ➕ Add Paper
+              Add Paper
             </button>
 
             <button type="submit" className="btn btn-save">
-              💾 Save
+              Save
             </button>
           </div>
         </form>

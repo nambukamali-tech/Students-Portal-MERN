@@ -1,257 +1,202 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { useAuth0 } from "@auth0/auth0-react";
-import { jwtDecode } from "jwt-decode";
 
 export default function AddScholarship() {
-  const { getAccessTokenSilently, isAuthenticated, logout } = useAuth0();
-
   const [form, setForm] = useState({
-    registerNumber: "",
-    dateOfBirth: "",
-    fatherName: "",
-    motherName: "",
-    fatherOccupation: "",
-    country: "",
-    state: "",
-    area: "",
-    community: "",
+    studentName: "",
     scholarshipName: "",
+    community: "",
     amount: "",
     academicYear: "",
   });
 
-  const [canAdd, setCanAdd] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  // 🔐 Check permission
-  useEffect(() => {
-    const checkPermission = async () => {
-      if (!isAuthenticated) return;
+  const validate = (fieldValues = form) => {
+    let temp = { ...errors };
 
-      try {
-        const token = await getAccessTokenSilently({
-          authorizationParams: { audience: "https://student-portal-api" },
-        });
+    if ("studentName" in fieldValues)
+      temp.studentName = fieldValues.studentName ? "" : "Student Name required";
 
-        const decoded = jwtDecode(token);
-        const permissions = decoded.permissions || [];
-        setCanAdd(permissions.includes("add:scholarship"));
-      } catch (err) {
-        console.error("Permission check error:", err);
-        setCanAdd(false);
-      }
-    };
+    if ("scholarshipName" in fieldValues)
+      temp.scholarshipName = fieldValues.scholarshipName ? "" : "Scholarship required";
 
-    checkPermission();
-  }, [isAuthenticated, getAccessTokenSilently]);
+    if ("community" in fieldValues)
+      temp.community = fieldValues.community ? "" : "Community required";
+
+    if ("amount" in fieldValues)
+      temp.amount = fieldValues.amount ? "" : "Amount required";
+
+    if ("academicYear" in fieldValues)
+      temp.academicYear = fieldValues.academicYear ? "" : "Academic Year required";
+
+    setErrors(temp);
+    return Object.values(temp).every((x) => x === "");
+  };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    validate({ [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
-    try {
-      const token = await getAccessTokenSilently({
-        authorizationParams: { audience: "https://student-portal-api" },
-      });
+    await axios.post("http://localhost:5000/api/scholarships", form);
+    alert("Scholarship added successfully ✅");
 
-      await axios.post("http://localhost:5000/api/scholarships", form, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      alert("Scholarship added successfully ✅");
-
-      setForm({
-        registerNumber: "",
-        dateOfBirth: "",
-        fatherName: "",
-        motherName: "",
-        fatherOccupation: "",
-        country: "",
-        state: "",
-        area: "",
-        community: "",
-        scholarshipName: "",
-        amount: "",
-        academicYear: "",
-      });
-    } catch (err) {
-      console.error("Add Scholarship Error:", err.response?.data || err.message);
-      alert("Failed to add scholarship ❌");
-    }
+    setForm({
+      studentName: "",
+      scholarshipName: "",
+      community: "",
+      amount: "",
+      academicYear: "",
+    });
   };
 
-  // 🔑 Auth checks
-  if (!isAuthenticated) {
-    return (
-      <p style={{ textAlign: "center" }}>
-        You must log in first.
-        <br />
-        <button
-          onClick={() =>
-            logout({
-              logoutParams: { returnTo: window.location.origin },
-            })
-          }
-        >
-          Logout
-        </button>
-      </p>
-    );
-  }
-
-  if (!canAdd) {
-    return <p style={{ textAlign: "center" }}>No permission to add scholarship.</p>;
-  }
-
-  // 🎨 UI
   return (
-    <div style={{ maxWidth: "600px", margin: "40px auto" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-        Add Scholarship
-      </h2>
+    <>
+      {/* 🔮 STYLES */}
+      <style>{`
+        .scholarship-container {
+          min-height: 100vh;
+          padding: 40px;
+          background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        }
 
-      <form onSubmit={handleSubmit} className="d-grid gap-3">
-        <div>
-          <label>Register Number</label>
-          <input
-            className="form-control"
-            name="registerNumber"
-            value={form.registerNumber}
-            onChange={handleChange}
-            required
-          />
+        .glass-card {
+          max-width: 650px;
+          margin: auto;
+          background: rgba(255,255,255,0.08);
+          backdrop-filter: blur(14px);
+          border-radius: 16px;
+          padding: 30px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+        }
+
+        .page-title {
+          text-align: center;
+          margin-bottom: 25px;
+          font-weight: 600;
+          background: linear-gradient(90deg, #00f5ff, #7cffcb);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .futuristic-input {
+          background: rgba(255,255,255,0.1) !important;
+          border: 1px solid rgba(255,255,255,0.25) !important;
+          color: #fff !important;
+          border-radius: 10px;
+        }
+
+        .futuristic-input::placeholder {
+          color: #ccc;
+        }
+
+        .is-invalid {
+          border-color: #ff4b5c !important;
+        }
+
+        .invalid-feedback {
+          color: #ff7a7a;
+        }
+
+        .btn-submit {
+          background: linear-gradient(135deg, #6366f1, #4f46e5);
+          border: none;
+          padding: 12px;
+          border-radius: 12px;
+          color: #fff;
+          margin-top: 15px;
+          font-weight: 600;
+        }
+
+        .btn-submit:hover {
+          opacity: 0.9;
+        }
+      `}</style>
+
+      {/* 🚀 FORM */}
+      <div className="scholarship-container">
+        <div className="glass-card">
+          <h2 className="page-title">🎓 Add Scholarship</h2>
+
+          <form onSubmit={handleSubmit}>
+            {/* Student Name */}
+            <div className="mb-3">
+              <label className="form-label text-light">Student Name</label>
+              <input
+                type="text"
+                name="studentName"
+                className={`form-control futuristic-input ${errors.studentName ? "is-invalid" : ""}`}
+                value={form.studentName}
+                onChange={handleChange}
+              />
+              <div className="invalid-feedback">{errors.studentName}</div>
+            </div>
+
+            {/* Scholarship Name */}
+            <div className="mb-3">
+              <label className="form-label text-light">Scholarship Name</label>
+              <input
+                type="text"
+                name="scholarshipName"
+                className={`form-control futuristic-input ${errors.scholarshipName ? "is-invalid" : ""}`}
+                value={form.scholarshipName}
+                onChange={handleChange}
+              />
+              <div className="invalid-feedback">{errors.scholarshipName}</div>
+            </div>
+
+            {/* Community */}
+            <div className="mb-3">
+              <label className="form-label text-light">Community</label>
+              <input
+                type="text"
+                name="community"
+                className={`form-control futuristic-input ${errors.community ? "is-invalid" : ""}`}
+                value={form.community}
+                onChange={handleChange}
+              />
+              <div className="invalid-feedback">{errors.community}</div>
+            </div>
+
+            {/* Amount */}
+            <div className="mb-3">
+              <label className="form-label text-light">Amount</label>
+              <input
+                type="number"
+                name="amount"
+                className={`form-control futuristic-input ${errors.amount ? "is-invalid" : ""}`}
+                value={form.amount}
+                onChange={handleChange}
+              />
+              <div className="invalid-feedback">{errors.amount}</div>
+            </div>
+
+            {/* Academic Year */}
+            <div className="mb-3">
+              <label className="form-label text-light">Academic Year</label>
+              <input
+                type="text"
+                name="academicYear"
+                placeholder="2024 - 2025"
+                className={`form-control futuristic-input ${errors.academicYear ? "is-invalid" : ""}`}
+                value={form.academicYear}
+                onChange={handleChange}
+              />
+              <div className="invalid-feedback">{errors.academicYear}</div>
+            </div>
+
+            <button type="submit" className="btn btn-submit w-100">
+              ➕ Add Scholarship
+            </button>
+          </form>
         </div>
-
-        <div>
-          <label>Date of Birth</label>
-          <input
-            className="form-control"
-            type="date"
-            name="dateOfBirth"
-            value={form.dateOfBirth}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Father Name</label>
-          <input
-            className="form-control"
-            name="fatherName"
-            value={form.fatherName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Mother Name</label>
-          <input
-            className="form-control"
-            name="motherName"
-            value={form.motherName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Father Occupation</label>
-          <input
-            className="form-control"
-            name="fatherOccupation"
-            value={form.fatherOccupation}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Country</label>
-          <input
-            className="form-control"
-            name="country"
-            value={form.country}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>State</label>
-          <input
-            className="form-control"
-            name="state"
-            value={form.state}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Area</label>
-          <input
-            className="form-control"
-            name="area"
-            value={form.area}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Community</label>
-          <input
-            className="form-control"
-            name="community"
-            value={form.community}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Scholarship Name</label>
-          <input
-            className="form-control"
-            name="scholarshipName"
-            value={form.scholarshipName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Amount</label>
-          <input
-            className="form-control"
-            type="number"
-            name="amount"
-            value={form.amount}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Academic Year</label>
-          <input
-            className="form-control"
-            name="academicYear"
-            value={form.academicYear}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button className="btn btn-primary mt-3" type="submit">
-          Save Scholarship
-        </button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 }
