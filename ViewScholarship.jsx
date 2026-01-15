@@ -114,7 +114,7 @@ export default function ViewScholarship() {
       {/* 🚀 UI */}
       <div className="scholarship-view-container">
         <div className="glass-card">
-          <h2 className="page-title">🎓 View Scholarship</h2>
+          <h2 className="page-title"> View Scholarship</h2>
 
           <div className="search-bar">
             <input
@@ -124,7 +124,7 @@ export default function ViewScholarship() {
               onChange={(e) => setRegisterNumber(e.target.value)}
             />
             <button className="btn btn-submit" onClick={fetchScholarship}>
-              🔍 Search
+               Search
             </button>
           </div>
 
